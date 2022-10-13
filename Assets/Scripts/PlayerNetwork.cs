@@ -35,11 +35,12 @@ public class PlayerNetwork : NetworkBehaviour {
       return;
     }
     if (Input.GetKeyDown(KeyCode.T)) {
-      myData.Value = new MyCustomData {
-        Int = Random.Range(0, 100),
-        Bool = !myData.Value.Bool,
-        Message = $"Hello there, from OwnerClientId: {OwnerClientId}"
-      };
+      TestServerRpc(new ServerRpcParams());
+      // myData.Value = new MyCustomData {
+      //   Int = Random.Range(0, 100),
+      //   Bool = !myData.Value.Bool,
+      //   Message = $"Hello there, from OwnerClientId: {OwnerClientId}"
+      // };
     }
     Vector3 moveDirection = Vector3.zero;
     if (Input.GetKey(KeyCode.W)) moveDirection.z = +1f;
@@ -49,5 +50,10 @@ public class PlayerNetwork : NetworkBehaviour {
 
     float moveSpeed = 3f;
     transform.position += moveDirection * moveSpeed * Time.deltaTime;
+  }
+
+  [ServerRpc]
+  private void TestServerRpc(ServerRpcParams serverRpcParams) {
+    Debug.Log($"TestServerRpc(): {OwnerClientId}; SenderClientId: {serverRpcParams.Receive.SenderClientId}");
   }
 }
