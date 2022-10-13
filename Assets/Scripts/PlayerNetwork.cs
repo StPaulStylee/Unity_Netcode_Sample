@@ -1,16 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
 public class PlayerNetwork : NetworkBehaviour {
-  private NetworkVariable<int> randomNumber = new NetworkVariable<int>(1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+  private NetworkVariable<MyCustomData> myData = new NetworkVariable<MyCustomData>(
+    new MyCustomData {
+      Int = 23,
+      Bool = true
+    }, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
   public override void OnNetworkSpawn() {
-    randomNumber.OnValueChanged += (int previousValue, int newValue) => {
+    myData.OnValueChanged += (MyCustomData previousValue, MyCustomData newValue) => {
       // OwnerClientId is part of NetworkBehavior
-      Debug.Log($"{OwnerClientId}; {randomNumber.Value}");
+      Debug.Log($"{OwnerClientId}; Int: {newValue.Int}, Bool: {newValue.Bool}, Message: {newValue.Message}");
     };
+  }
+
+  public struct MyCustomData : INetworkSerializable {
+    public int Int;
+    public bool Bool;
+    public FixedString128Bytes Message;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter {
+      serializer.SerializeValue(ref Int);
+      serializer.SerializeValue(ref Bool);
+      serializer.SerializeValue(ref Message);
+    }
   }
 
   private void Update() {
@@ -18,7 +35,11 @@ public class PlayerNetwork : NetworkBehaviour {
       return;
     }
     if (Input.GetKeyDown(KeyCode.T)) {
-      randomNumber.Value = Random.Range(0, 100);
+      myData.Value = new MyCustomData {
+        Int = Random.Range(0, 100),
+        Bool = !myData.Value.Bool,
+        Message = $"Hello there, from OwnerClientId: {OwnerClientId}"
+      };
     }
     Vector3 moveDirection = Vector3.zero;
     if (Input.GetKey(KeyCode.W)) moveDirection.z = +1f;
