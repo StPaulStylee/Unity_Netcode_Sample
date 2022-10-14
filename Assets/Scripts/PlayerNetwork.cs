@@ -35,7 +35,8 @@ public class PlayerNetwork : NetworkBehaviour {
       return;
     }
     if (Input.GetKeyDown(KeyCode.T)) {
-      TestServerRpc(new ServerRpcParams());
+      TestClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new List<ulong> { 1 } } });
+      // TestServerRpc(new ServerRpcParams());
       // myData.Value = new MyCustomData {
       //   Int = Random.Range(0, 100),
       //   Bool = !myData.Value.Bool,
@@ -55,5 +56,10 @@ public class PlayerNetwork : NetworkBehaviour {
   [ServerRpc]
   private void TestServerRpc(ServerRpcParams serverRpcParams) {
     Debug.Log($"TestServerRpc(): {OwnerClientId}; SenderClientId: {serverRpcParams.Receive.SenderClientId}");
+  }
+
+  [ClientRpc]
+  private void TestClientRpc(ClientRpcParams clientRpcParams) {
+    Debug.Log($"ClientServerRpc(): {OwnerClientId}");
   }
 }
