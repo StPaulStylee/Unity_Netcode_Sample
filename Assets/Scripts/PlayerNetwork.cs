@@ -5,6 +5,9 @@ using Unity.Netcode;
 using UnityEngine;
 
 public class PlayerNetwork : NetworkBehaviour {
+
+  [SerializeField] private Transform spawnedObjectPrefab;
+
   private NetworkVariable<MyCustomData> myData = new NetworkVariable<MyCustomData>(
     new MyCustomData {
       Int = 23,
@@ -35,7 +38,9 @@ public class PlayerNetwork : NetworkBehaviour {
       return;
     }
     if (Input.GetKeyDown(KeyCode.T)) {
-      TestClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new List<ulong> { 1 } } });
+      Transform spawnedObject = Instantiate(spawnedObjectPrefab);
+      spawnedObject.GetComponent<NetworkObject>().Spawn(true);
+      // TestClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new List<ulong> { 1 } } });
       // TestServerRpc(new ServerRpcParams());
       // myData.Value = new MyCustomData {
       //   Int = Random.Range(0, 100),
