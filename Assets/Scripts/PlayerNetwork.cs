@@ -7,6 +7,7 @@ using UnityEngine;
 public class PlayerNetwork : NetworkBehaviour {
 
   [SerializeField] private Transform spawnedObjectPrefab;
+  private Transform spawnedObject;
 
   private NetworkVariable<MyCustomData> myData = new NetworkVariable<MyCustomData>(
     new MyCustomData {
@@ -38,7 +39,7 @@ public class PlayerNetwork : NetworkBehaviour {
       return;
     }
     if (Input.GetKeyDown(KeyCode.T)) {
-      Transform spawnedObject = Instantiate(spawnedObjectPrefab);
+      spawnedObject = Instantiate(spawnedObjectPrefab);
       spawnedObject.GetComponent<NetworkObject>().Spawn(true);
       // TestClientRpc(new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new List<ulong> { 1 } } });
       // TestServerRpc(new ServerRpcParams());
@@ -48,6 +49,11 @@ public class PlayerNetwork : NetworkBehaviour {
       //   Message = $"Hello there, from OwnerClientId: {OwnerClientId}"
       // };
     }
+
+    if (Input.GetKeyDown(KeyCode.Y)) {
+      Destroy(spawnedObject.gameObject);
+    }
+
     Vector3 moveDirection = Vector3.zero;
     if (Input.GetKey(KeyCode.W)) moveDirection.z = +1f;
     if (Input.GetKey(KeyCode.S)) moveDirection.z = -1f;
